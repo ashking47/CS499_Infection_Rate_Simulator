@@ -1,12 +1,17 @@
 var lastClicked;
-var grid = clickableGrid(20,40,function(el,row,col,i){
+var grid = clickableGrid(30,60,function(el,row,col,i){
     console.log("You clicked on element:",el);
     console.log("You clicked on row:",row);
     console.log("You clicked on col:",col);
     console.log("You clicked on item #:",i);
 
-    el.className='clicked';
-    if (lastClicked) lastClicked.className='';
+    if (el.className!='I') {
+        el.className='I';
+    }
+    else {
+        el.className='S';
+    }
+    //if (lastClicked) lastClicked.className='';
     lastClicked = el;
 });
 
@@ -21,6 +26,7 @@ function clickableGrid( rows, cols, callback ){
         for (var c=0;c<cols;++c){
             var cell = tr.appendChild(document.createElement('td'));
             //cell.innerHTML = ++i;
+            cell.className='S';
             cell.addEventListener('click',(function(el,r,c,i){
                 return function(){
                     callback(el,r,c,i);
