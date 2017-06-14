@@ -13,6 +13,7 @@ var grid = clickableGrid(30,60,function(el,row,col,i){
     }
     //if (lastClicked) lastClicked.className='';
     lastClicked = el;
+
 });
 
 document.body.appendChild(grid);
@@ -25,14 +26,32 @@ function clickableGrid( rows, cols, callback ){
         var tr = grid.appendChild(document.createElement('tr'));
         for (var c=0;c<cols;++c){
             var cell = tr.appendChild(document.createElement('td'));
-            //cell.innerHTML = ++i;
+            cell.setAttribute("row", r);
+            cell.setAttribute("col", c);
+            cell.id = i;
             cell.className='S';
             cell.addEventListener('click',(function(el,r,c,i){
                 return function(){
                     callback(el,r,c,i);
                 }
             })(cell,r,c,i),false);
+            i++;
         }
     }
     return grid;
+}
+
+function getCellAt(row, col)    {
+  var All = document.getElementsByTagName('*');
+  for (var i = 0; i < All.length; i++)       {
+    if (All[i].getAttribute("row") == row && All[i].getAttribute("col") == col) { return All[i] }
+  }
+}
+
+function alterCell(cell, state){
+    cell.className=state;
+}
+
+function nextStep(grid) {
+
 }
