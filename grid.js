@@ -1,5 +1,7 @@
-var lastClicked;
-var grid = clickableGrid(30,60,function(el,row,col,i){
+var rows = 30;
+var cols = 60;
+
+var grid = clickableGrid(rows,cols,function(el,row,col,i){
     console.log("You clicked on element:",el);
     console.log("You clicked on row:",row);
     console.log("You clicked on col:",col);
@@ -11,8 +13,6 @@ var grid = clickableGrid(30,60,function(el,row,col,i){
     else {
         el.className='S';
     }
-    //if (lastClicked) lastClicked.className='';
-    lastClicked = el;
 
 });
 
@@ -52,6 +52,13 @@ function alterCell(cell, state){
     cell.className=state;
 }
 
-function nextStep(grid) {
-
+function nextStep() {
+    for (var r=0;r<rows;++r){
+        for (var c=0;c<cols;++c){
+            cell = getCellAt(r, c)
+            if (cell.className=="I") {
+                alterCell(cell, "R");
+            }
+        }
+    }
 }
