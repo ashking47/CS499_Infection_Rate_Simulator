@@ -65,7 +65,7 @@ function nextStep() {
     for (var r = 0; r < rows; ++r) {
         for (var c = 0; c < cols; ++c) {
             if ( grid[r][c].getAttribute("state") == "I") {
-                grid[r][c].setAttribute("state", "R");
+                grid[r][c].setAttribute("state", "R"); //Want to create functions like "infect neighbors(r,c)" and "try recovery(r,c)"
             }
         }
     }
