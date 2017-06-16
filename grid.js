@@ -1,30 +1,43 @@
 var rows = 30;
 var cols = 60;
+var mapOfInfected = new Map();
 
-var image = clickableGrid(rows,cols,function(cell,row,col,i){
+var grid = clickableGrid(rows,cols,function(el,row,col,i){
+    console.log("You clicked on element:",el);
+    console.log("You clicked on row:",row);
+    console.log("You clicked on col:",col);
+    console.log("You clicked on item #:",i);
 
-    if (cell.getAttribute("state")!='I') {
-        cell.setAttribute("state", "I");
+    if (el.className!='I') {
+        el.className='I';
+        mapOfInfected.set((el.getAttribute(row),el.getAttribute(col)), 1);
     }
     else {
-        cell.setAttribute("state", "S");
+        el.className='S';
+        mapOfInfected.delete(el.getAttribute(row),el.getAttribute(col));
     }
 
 });
 
+
+function getListOfInfected(){
+    return mapOfInfected;
+}
+
+document.body.appendChild(grid);
+     
 function clickableGrid( rows, cols, callback ){
     var i=0;
-    var table = document.createElement('table');
-    table.className = 'grid';
+    var grid = document.createElement('table');
+    grid.className = 'grid';
     for (var r=0;r<rows;++r){
-        var tr = table.appendChild(document.createElement('tr'));
+        var tr = grid.appendChild(document.createElement('tr'));
         for (var c=0;c<cols;++c){
             var cell = tr.appendChild(document.createElement('td'));
-            cell.className='cell';
             cell.setAttribute("row", r);
             cell.setAttribute("col", c);
-            cell.setAttribute("state", "S");
             cell.id = i;
+            cell.className='S';
             cell.addEventListener('click',(function(el,r,c,i){
                 return function(){
                     callback(el,r,c,i);
@@ -33,20 +46,7 @@ function clickableGrid( rows, cols, callback ){
             i++;
         }
     }
-    return table;
-}
-
-document.body.appendChild(image);     
-
-var grid = []
-
-function init_grid() {
-    for (var r = 0; r < rows; ++r) {
-        grid[r] = [];
-        for (var c = 0; c < cols; ++c) {
-            grid[r][c] = getCellAt(r, c);
-        }
-    }
+    return grid;
 }
 
 function getCellAt(row, col)    {
@@ -61,11 +61,11 @@ function alterCell(cell, state){
 }
 
 function nextStep() {
-    init_grid();
-    for (var r = 0; r < rows; ++r) {
-        for (var c = 0; c < cols; ++c) {
-            if ( grid[r][c].getAttribute("state") == "I") {
-                grid[r][c].setAttribute("state", "R"); //Want to create functions like "infect neighbors(r,c)" and "try recovery(r,c)"
+    for (var r=0;r<rows;++r){
+        for (var c=0;c<cols;++c){
+            cell = getCellAt(r, c)
+            if (cell.className=="I") {
+                alterCell(cell, "R");
             }
         }
     }
