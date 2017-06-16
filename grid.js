@@ -1,35 +1,30 @@
 var rows = 30;
 var cols = 60;
 
-var grid = clickableGrid(rows,cols,function(el,row,col,i){
-    console.log("You clicked on element:",el);
-    console.log("You clicked on row:",row);
-    console.log("You clicked on col:",col);
-    console.log("You clicked on item #:",i);
+var image = clickableGrid(rows,cols,function(cell,row,col,i){
 
-    if (el.className!='I') {
-        el.className='I';
+    if (cell.getAttribute("state")!='I') {
+        cell.setAttribute("state", "I");
     }
     else {
-        el.className='S';
+        cell.setAttribute("state", "S");
     }
 
 });
 
-document.body.appendChild(grid);
-     
 function clickableGrid( rows, cols, callback ){
     var i=0;
-    var grid = document.createElement('table');
-    grid.className = 'grid';
+    var table = document.createElement('table');
+    table.className = 'grid';
     for (var r=0;r<rows;++r){
-        var tr = grid.appendChild(document.createElement('tr'));
+        var tr = table.appendChild(document.createElement('tr'));
         for (var c=0;c<cols;++c){
             var cell = tr.appendChild(document.createElement('td'));
+            cell.className='cell';
             cell.setAttribute("row", r);
             cell.setAttribute("col", c);
+            cell.setAttribute("state", "S");
             cell.id = i;
-            cell.className='S';
             cell.addEventListener('click',(function(el,r,c,i){
                 return function(){
                     callback(el,r,c,i);
@@ -38,7 +33,20 @@ function clickableGrid( rows, cols, callback ){
             i++;
         }
     }
-    return grid;
+    return table;
+}
+
+document.body.appendChild(image);     
+
+var grid = []
+
+function init_grid() {
+    for (var r = 0; r < rows; ++r) {
+        grid[r] = [];
+        for (var c = 0; c < cols; ++c) {
+            grid[r][c] = getCellAt(r, c);
+        }
+    }
 }
 
 function getCellAt(row, col)    {
@@ -53,11 +61,11 @@ function alterCell(cell, state){
 }
 
 function nextStep() {
-    for (var r=0;r<rows;++r){
-        for (var c=0;c<cols;++c){
-            cell = getCellAt(r, c)
-            if (cell.className=="I") {
-                alterCell(cell, "R");
+    init_grid();
+    for (var r = 0; r < rows; ++r) {
+        for (var c = 0; c < cols; ++c) {
+            if ( grid[r][c].getAttribute("state") == "I") {
+                grid[r][c].setAttribute("state", "R");
             }
         }
     }
