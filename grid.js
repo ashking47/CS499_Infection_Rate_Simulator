@@ -49,6 +49,17 @@ function init_grid() {
     }
 }
 
+function getGridCopy() {
+    var newgrid = [];
+    for (var r = 0; r < rows; ++r) {
+        newgrid[r] = [];
+        for (var c = 0; c < cols; ++c) {
+            newgrid[r][c] = grid[r][c].getAttribute("state");
+        }
+    }
+    return newgrid;
+}
+
 function getCellAt(row, col)    {
   var All = document.getElementsByTagName('*');
   for (var i = 0; i < All.length; i++)       {
@@ -62,11 +73,28 @@ function alterCell(cell, state){
 
 function nextStep() {
     init_grid();
+    var newgrid = getGridCopy();
     for (var r = 0; r < rows; ++r) {
         for (var c = 0; c < cols; ++c) {
+            
             if ( grid[r][c].getAttribute("state") == "I") {
-                grid[r][c].setAttribute("state", "R"); //Want to create functions like "infect neighbors(r,c)" and "try recovery(r,c)"
+                for(var i = -1; i<=1; i++){
+                    for (var ii = -1; ii<=1; ii++) {
+                        newgrid[r+i][c+ii] = "I" //Want to create functions like "infect neighbors(r,c)" and "try recovery(r,c)";    
+                    }
+                }
             }
+            
         }
     }
+    for (var r = 0; r < rows; ++r) {
+        for (var c = 0; c < cols; ++c) {
+            grid[r][c].setAttribute("state", newgrid[r][c]);
+        }
+    }
+    //grid = newgrid;
+}
+
+function infect(r, c){
+
 }
