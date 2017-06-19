@@ -1,30 +1,37 @@
 var rows = 30;
 var cols = 60;
+var mapOfInfected = new Map();
 
 var image = clickableGrid(rows,cols,function(cell,row,col,i){
 
-    if (cell.getAttribute("state")!='I') {
-        cell.setAttribute("state", "I");
+    if (cell.getAttribute("state") !='I') {
+        cell.setAttribute("state", "I")
+        mapOfInfected.set((cell.getAttribute(row),cell.getAttribute(col)), 1);
     }
     else {
-        cell.setAttribute("state", "S");
+        cell.setAttribute("state", "S")
+        mapOfInfected.delete(cell.getAttribute(row),cell.getAttribute(col));
     }
 
 });
 
+
+function getListOfInfected(){
+    return mapOfInfected;
+}
+     
 function clickableGrid( rows, cols, callback ){
     var i=0;
-    var table = document.createElement('table');
-    table.className = 'grid';
+    var grid = document.createElement('table');
+    grid.className = 'grid';
     for (var r=0;r<rows;++r){
-        var tr = table.appendChild(document.createElement('tr'));
+        var tr = grid.appendChild(document.createElement('tr'));
         for (var c=0;c<cols;++c){
             var cell = tr.appendChild(document.createElement('td'));
-            cell.className='cell';
             cell.setAttribute("row", r);
             cell.setAttribute("col", c);
-            cell.setAttribute("state", "S");
             cell.id = i;
+            alterCell(cell, "S");
             cell.addEventListener('click',(function(el,r,c,i){
                 return function(){
                     callback(el,r,c,i);
@@ -33,7 +40,7 @@ function clickableGrid( rows, cols, callback ){
             i++;
         }
     }
-    return table;
+    return grid;
 }
 
 document.body.appendChild(image);     
@@ -68,7 +75,7 @@ function getCellAt(row, col)    {
 }
 
 function alterCell(cell, state){
-    cell.className=state;
+    cell.setAttribute("state", state)
 }
 
 function nextStep() {
@@ -84,7 +91,6 @@ function nextStep() {
                     }
                 }
             }
-            
         }
     }
     for (var r = 0; r < rows; ++r) {
@@ -92,7 +98,7 @@ function nextStep() {
             grid[r][c].setAttribute("state", newgrid[r][c]);
         }
     }
-    //grid = newgrid;
+    
 }
 
 function infect(r, c){
