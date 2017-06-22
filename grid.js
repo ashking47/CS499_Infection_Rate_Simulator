@@ -83,14 +83,19 @@ function nextStep() {
     var newgrid = getGridCopy();
     for (var r = 0; r < rows; ++r) {
         for (var c = 0; c < cols; ++c) {
+            var cell = grid[r][c];
             
-            if ( grid[r][c].getAttribute("state") == "I") {
+            if ( isInfected(cell) ) {
+                newgrid[r][c] = tryRecover(r, c);
                 for(var i = -1; i<=1; i++){
                     for (var ii = -1; ii<=1; ii++) {
-                        newgrid[r+i][c+ii] = "I" //Want to create functions like "infect neighbors(r,c)" and "try recovery(r,c)";    
+                        if (grid[r+i][c+ii].getAttribute("state") == "S") {
+                            newgrid[r+i][c+ii] = tryInfectNeighbor(r, c);
+                        }     
                     }
                 }
             }
+
         }
     }
     for (var r = 0; r < rows; ++r) {
@@ -101,6 +106,39 @@ function nextStep() {
     
 }
 
-function infect(r, c){
+function isInfected(cell){
+    return cell.getAttribute("state") == "I";
+}
 
+function isSus(cell){
+    return cell.getAttribute("state") == "S";
+}
+
+function tryRecover(r, c){
+    var chance = 0.5;
+    for(var i = -1; i<=1; i++){
+        for (var ii = -1; ii<=1; ii++) {
+            if (grid[r+i][c+ii].getAttribute("state") == "I") {
+                chance -= .04;
+            }     
+        }
+    }
+    if (rando() <= chance) {
+        return "R";
+    } else {
+        return "I";
+    }
+
+}
+
+function tryInfectNeighbor(){
+    if (rando() <= .5) {
+        return "I";
+    } else {
+        return "S";
+    }
+}
+
+function rando(){
+    return Math.random();
 }
