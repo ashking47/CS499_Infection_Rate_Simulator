@@ -1,5 +1,5 @@
-var rows = 30;
-var cols = 60;
+var rows = 30; //30
+var cols = 60; //60
 var mapOfInfected = new Map();
 
 var image = clickableGrid(rows,cols,function(cell,row,col,i){
@@ -24,9 +24,9 @@ function clickableGrid( rows, cols, callback ){
     var i=0;
     var grid = document.createElement('table');
     grid.className = 'grid';
-    for (var r=0;r<rows;++r){
+    for (var r=0; r<rows; r++){
         var tr = grid.appendChild(document.createElement('tr'));
-        for (var c=0;c<cols;++c){
+        for (var c=0; c<cols; c++){
             var cell = tr.appendChild(document.createElement('td'));
             cell.setAttribute("row", r);
             cell.setAttribute("col", c);
@@ -48,9 +48,9 @@ document.body.appendChild(image);
 var grid = []
 
 function init_grid() {
-    for (var r = 0; r < rows; ++r) {
+    for (var r = 0; r < rows; r++) {
         grid[r] = [];
-        for (var c = 0; c < cols; ++c) {
+        for (var c = 0; c < cols; c++) {
             grid[r][c] = getCellAt(r, c);
         }
     }
@@ -58,9 +58,9 @@ function init_grid() {
 
 function getGridCopy() {
     var newgrid = [];
-    for (var r = 0; r < rows; ++r) {
+    for (var r = 0; r < rows; r++) {
         newgrid[r] = [];
-        for (var c = 0; c < cols; ++c) {
+        for (var c = 0; c < cols; c++) {
             newgrid[r][c] = grid[r][c].getAttribute("state");
         }
     }
@@ -81,19 +81,41 @@ function alterCell(cell, state){
 function nextStep() {
     init_grid();
     var newgrid = getGridCopy();
-    for (var r = 0; r < rows; ++r) {
-        for (var c = 0; c < cols; ++c) {
+    for (var r = 0; r < rows; r++) {
+        for (var c = 0; c < cols; c++) {
             var cell = grid[r][c];
             
+            var left = -1;
+            var right = 1;
+            var top = -1;
+            var bottom = 1;
+
             if ( isInfected(cell) ) {
+
+                if (r == 0) {
+                    top = 0;
+                }
+
+               if (r == rows-1) {
+                    bottom = 0;
+                }
+
+                if (c == 0) {
+                    left = 0;
+                }
+
+                if (c == cols-1) {
+                    right = 0;
+                }
+
                 if( isAlive() ) {
                     newgrid[r][c] = tryRecover(r, c);
                 } else {
                     newgrid[r][c] = "D";
                 }
-                //newgrid[r][c] = tryDeath(r, c);
-                for(var i = -1; i<=1; i++){
-                    for (var ii = -1; ii<=1; ii++) {
+
+                for(var i = top; i<=bottom; i++){
+                    for (var ii = left; ii<=right; ii++) {
                         if (grid[r+i][c+ii].getAttribute("state") == "S") {
                             newgrid[r+i][c+ii] = tryInfectNeighbor(r, c);
                         }     
@@ -103,8 +125,8 @@ function nextStep() {
 
         }
     }
-    for (var r = 0; r < rows; ++r) {
-        for (var c = 0; c < cols; ++c) {
+    for (var r = 0; r < rows; r++) {
+        for (var c = 0; c < cols; c++) {
             grid[r][c].setAttribute("state", newgrid[r][c]);
         }
     }
@@ -121,8 +143,32 @@ function isSus(cell){
 
 function tryRecover(r, c){
     var chance = 0.5;
-    for(var i = -1; i<=1; i++){
-        for (var ii = -1; ii<=1; ii++) {
+    
+    var left = -1;
+    var right = 1;
+    var top = -1;
+    var bottom = 1;
+
+    if (r == 0) {
+        top = 0;
+    }
+
+    if (r == rows-1) {
+        bottom = 0;
+    }
+
+    if (c == 0) {
+        left = 0;
+    }
+
+    if (c == cols-1) {
+        right = 0;
+    }
+    
+    //for(var i = -1; i<=1; i++){
+    //    for (var ii = -1; ii<=1; ii++) {
+    for(var i = top; i<=bottom; i++){
+        for (var ii = left; ii<=right; ii++) {
             if (grid[r+i][c+ii].getAttribute("state") == "I") {
                 chance -= .04;
             }     
