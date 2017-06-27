@@ -86,7 +86,11 @@ function nextStep() {
             var cell = grid[r][c];
             
             if ( isInfected(cell) ) {
-                newgrid[r][c] = tryRecover(r, c);
+                if( isAlive() ) {
+                    newgrid[r][c] = tryRecover(r, c);
+                } else {
+                    newgrid[r][c] = "D";
+                }
                 //newgrid[r][c] = tryDeath(r, c);
                 for(var i = -1; i<=1; i++){
                     for (var ii = -1; ii<=1; ii++) {
@@ -132,19 +136,12 @@ function tryRecover(r, c){
 
 }
 
-function tryDeath(r, c){
-    var chance = 0.2;
-    for(var i = -1; i<=1; i++){
-        for (var ii = -1; ii<=1; ii++) {
-            if (grid[r+i][c+ii].getAttribute("state") == "I") {
-                chance -= .02;
-            }     
-        }
-    }
-    if (rando() <= chance) {
-        return "D";
+function isAlive(){
+    var chanceOfDeath = 0.04;
+    if (rando() <= chanceOfDeath) {
+        return false;
     } else {
-        return "I";
+        return true;
     }
 }
 
