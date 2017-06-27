@@ -87,6 +87,7 @@ function nextStep() {
             
             if ( isInfected(cell) ) {
                 newgrid[r][c] = tryRecover(r, c);
+                //newgrid[r][c] = tryDeath(r, c);
                 for(var i = -1; i<=1; i++){
                     for (var ii = -1; ii<=1; ii++) {
                         if (grid[r+i][c+ii].getAttribute("state") == "S") {
@@ -129,6 +130,22 @@ function tryRecover(r, c){
         return "I";
     }
 
+}
+
+function tryDeath(r, c){
+    var chance = 0.2;
+    for(var i = -1; i<=1; i++){
+        for (var ii = -1; ii<=1; ii++) {
+            if (grid[r+i][c+ii].getAttribute("state") == "I") {
+                chance -= .02;
+            }     
+        }
+    }
+    if (rando() <= chance) {
+        return "D";
+    } else {
+        return "I";
+    }
 }
 
 function tryInfectNeighbor(){
