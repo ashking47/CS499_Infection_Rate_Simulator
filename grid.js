@@ -86,9 +86,7 @@ function nextStep() {
             var cell = grid[r][c];
 
             if ( isInfected(cell) ) {
-
-                newgrid = spread(newgrid, r, c);
-                
+                spreadFrom(newgrid, r, c);
             }
 
         }
@@ -101,29 +99,35 @@ function nextStep() {
     
 }
 
-function spread(newgrid, r, c){
+function spreadFrom(newgrid, r, c){
     
-    var borders = getBorders(r, c);
-    var left = borders.left;
-    var right = borders.right;
-    var top = borders.top;
-    var bottom = borders.bottom;
-
     if( isAlive() ) {
         newgrid[r][c] = tryRecover(r, c);
     } else {
         newgrid[r][c] = "D";
     }
 
+    doThisToNeighbors(r,c,infectNeighbor,newgrid);
+
+}
+
+function doThisToNeighbors(r, c, thisFunction, mut) {
+    var borders = getBorders(r, c);
+    var left = borders.left;
+    var right = borders.right;
+    var top = borders.top;
+    var bottom = borders.bottom;
     for(var i = top; i<=bottom; i++){
         for (var ii = left; ii<=right; ii++) {
-            if (grid[r+i][c+ii].getAttribute("state") == "S") {
-                newgrid[r+i][c+ii] = tryInfectNeighbor(r, c);
-            }     
+            thisFunction(r, c, i, ii, mut);    
         }
     }
+}
 
-    return newgrid;
+function infectNeighbor(r, c, i, ii, newgrid) {
+    if (grid[r+i][c+ii].getAttribute("state") == "S") {
+        newgrid[r+i][c+ii] = tryInfectNeighbor(r, c);
+    }
 }
 
 function getBorders(r, c) {
@@ -131,30 +135,24 @@ function getBorders(r, c) {
     var right = 1;
     var top = -1;
     var bottom = 1;
-
     if (r == 0) {
         top = 0;
     }
-
     if (r == rows-1) {
         bottom = 0;
     }
-
     if (c == 0) {
         left = 0;
     }
-
     if (c == cols-1) {
         right = 0;
     }
-
     return {
         top: top,
         bottom: bottom,
         left: left,
         right: right
     };
-
 }
 
 function isInfected(cell){
@@ -166,27 +164,23 @@ function isSus(cell){
 }
 
 function tryRecover(r, c){
-    var chance = 0.5;
-    
-    var borders = getBorders(r, c);
-    var left = borders.left;
-    var right = borders.right;
-    var top = borders.top;
-    var bottom = borders.bottom;
-    
-    for(var i = top; i<=bottom; i++){
-        for (var ii = left; ii<=right; ii++) {
-            if (grid[r+i][c+ii].getAttribute("state") == "I") {
-                chance -= .04;
-            }     
-        }
-    }
+
+    var infectedCount = 0
+    doThisToNeighbors(r,c,countInfected,infectedCount);
+    var chance = 0.5 - (0.04 * infectedCount);
+
     if (rando() <= chance) {
         return "R";
     } else {
         return "I";
     }
 
+}
+
+function countInfected(r, c, i, ii, infectedNeighbors) {
+    if (grid[r+i][c+ii].getAttribute("state") == "I") {
+        infectedNeighbors += 1;
+    }  
 }
 
 function isAlive(){
