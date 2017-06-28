@@ -84,43 +84,11 @@ function nextStep() {
     for (var r = 0; r < rows; r++) {
         for (var c = 0; c < cols; c++) {
             var cell = grid[r][c];
-            
-            var left = -1;
-            var right = 1;
-            var top = -1;
-            var bottom = 1;
 
             if ( isInfected(cell) ) {
 
-                if (r == 0) {
-                    top = 0;
-                }
-
-               if (r == rows-1) {
-                    bottom = 0;
-                }
-
-                if (c == 0) {
-                    left = 0;
-                }
-
-                if (c == cols-1) {
-                    right = 0;
-                }
-
-                if( isAlive() ) {
-                    newgrid[r][c] = tryRecover(r, c);
-                } else {
-                    newgrid[r][c] = "D";
-                }
-
-                for(var i = top; i<=bottom; i++){
-                    for (var ii = left; ii<=right; ii++) {
-                        if (grid[r+i][c+ii].getAttribute("state") == "S") {
-                            newgrid[r+i][c+ii] = tryInfectNeighbor(r, c);
-                        }     
-                    }
-                }
+                newgrid = spread(newgrid, r, c);
+                
             }
 
         }
@@ -133,17 +101,32 @@ function nextStep() {
     
 }
 
-function isInfected(cell){
-    return cell.getAttribute("state") == "I";
-}
-
-function isSus(cell){
-    return cell.getAttribute("state") == "S";
-}
-
-function tryRecover(r, c){
-    var chance = 0.5;
+function spread(newgrid, r, c){
     
+    var borders = getBorders(r, c);
+    var left = borders.left;
+    var right = borders.right;
+    var top = borders.top;
+    var bottom = borders.bottom;
+
+    if( isAlive() ) {
+        newgrid[r][c] = tryRecover(r, c);
+    } else {
+        newgrid[r][c] = "D";
+    }
+
+    for(var i = top; i<=bottom; i++){
+        for (var ii = left; ii<=right; ii++) {
+            if (grid[r+i][c+ii].getAttribute("state") == "S") {
+                newgrid[r+i][c+ii] = tryInfectNeighbor(r, c);
+            }     
+        }
+    }
+
+    return newgrid;
+}
+
+function getBorders(r, c) {
     var left = -1;
     var right = 1;
     var top = -1;
@@ -164,9 +147,33 @@ function tryRecover(r, c){
     if (c == cols-1) {
         right = 0;
     }
+
+    return {
+        top: top,
+        bottom: bottom,
+        left: left,
+        right: right
+    };
+
+}
+
+function isInfected(cell){
+    return cell.getAttribute("state") == "I";
+}
+
+function isSus(cell){
+    return cell.getAttribute("state") == "S";
+}
+
+function tryRecover(r, c){
+    var chance = 0.5;
     
-    //for(var i = -1; i<=1; i++){
-    //    for (var ii = -1; ii<=1; ii++) {
+    var borders = getBorders(r, c);
+    var left = borders.left;
+    var right = borders.right;
+    var top = borders.top;
+    var bottom = borders.bottom;
+    
     for(var i = top; i<=bottom; i++){
         for (var ii = left; ii<=right; ii++) {
             if (grid[r+i][c+ii].getAttribute("state") == "I") {
