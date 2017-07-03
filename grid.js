@@ -2,25 +2,42 @@ var rows = 35; //30
 var cols = 70; //60
 var mapOfInfected = new Map();
 var listOfInfected = [];
+var modifiedCells = [];
 
 var image = clickableGrid(rows,cols,function(cell,row,col,i){
 
     if (cell.getAttribute("state") !='I') {
         cell.setAttribute("state", "I");
         listOfInfected.push(cell);
-        mapOfInfected.set((cell.getAttribute(row),cell.getAttribute(col)), 1);
+        printCells(listOfInfected);
+        modifiedCells.push(cell);
+
     }
     else {
         cell.setAttribute("state", "S");
-        mapOfInfected.delete(cell.getAttribute(row),cell.getAttribute(col));
+        removeInfected(cell, listOfInfected);
+        removeInfected(cell, modifiedCells);
+
     }
 
 });
 
-
-function getListOfInfected(){
-    return mapOfInfected;
+function printCells(array){
+    for(var i = 0; i < array.length; i++){
+        console.log(array[i]);
+    }
 }
+
+
+function removeInfected(cell, array){
+    var row = (cell.getAttribute("row"));
+    var col = (cell.getAttribute("col"));
+    var index = array.indexOf(getCellAt(row, col));
+    if(index != -1){
+        array.splice(index, 1);
+    }
+}
+
      
 function clickableGrid( rows, cols, callback ){
     var i=0;
@@ -83,6 +100,7 @@ function alterCell(cell, state){
 function nextStep() {
     init_grid();
     var newgrid = getGridCopy();
+    printCells(modifiedCells);
 
      for (var i = 0; i < listOfInfected.length; i++) {
             var cell = listOfInfected[i];
@@ -106,6 +124,7 @@ function spreadFrom(newgrid, r, c){
         newgrid[r][c] = tryRecover(r, c);
     } else {
         newgrid[r][c] = "D";
+        modifiedCells.push(getCellAt(r,c));
     }
 
     doThisToNeighbors(r,c,infectNeighbor,newgrid);
@@ -131,6 +150,7 @@ function infectNeighbor(r, c, i, ii, newgrid) {
         newgrid[r+i][c+ii] = state;
         if (state == "I") {
             listOfInfected.push(grid[r+i][c+ii]);
+            modifiedCells.push(grid[r+i][c+ii]);
         }
     }
 }
@@ -175,11 +195,12 @@ function tryRecover(r, c){
     var chance = 0.5 - (0.04 * infectedCount);
 
     if (rando() <= chance) {
-        return "R";
-        index = listOfInfected.indexOf(getcellAt(r, c));
+        index = listOfInfected.indexOf(getCellAt(r, c));
         if (index > -1) {
-            array.splice(index, 1);
+            listOfInfected.splice(index, 1);
         }
+        modifiedCells.push(getCellAt(r,c));
+        return "R";
     } else {
         return "I";
     }
