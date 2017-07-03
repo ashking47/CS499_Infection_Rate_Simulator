@@ -1,15 +1,17 @@
-var rows = 30; //30
-var cols = 60; //60
+var rows = 35; //30
+var cols = 70; //60
 var mapOfInfected = new Map();
+var listOfInfected = [];
 
 var image = clickableGrid(rows,cols,function(cell,row,col,i){
 
     if (cell.getAttribute("state") !='I') {
-        cell.setAttribute("state", "I")
+        cell.setAttribute("state", "I");
+        listOfInfected.push(cell);
         mapOfInfected.set((cell.getAttribute(row),cell.getAttribute(col)), 1);
     }
     else {
-        cell.setAttribute("state", "S")
+        cell.setAttribute("state", "S");
         mapOfInfected.delete(cell.getAttribute(row),cell.getAttribute(col));
     }
 
@@ -81,16 +83,15 @@ function alterCell(cell, state){
 function nextStep() {
     init_grid();
     var newgrid = getGridCopy();
-    for (var r = 0; r < rows; r++) {
-        for (var c = 0; c < cols; c++) {
-            var cell = grid[r][c];
 
+     for (var i = 0; i < listOfInfected.length; i++) {
+            var cell = listOfInfected[i];
             if ( isInfected(cell) ) {
-                spreadFrom(newgrid, r, c);
+                spreadFrom(newgrid, parseInt(cell.getAttribute("row")), parseInt(cell.getAttribute("col")));
             }
 
         }
-    }
+
     for (var r = 0; r < rows; r++) {
         for (var c = 0; c < cols; c++) {
             grid[r][c].setAttribute("state", newgrid[r][c]);
@@ -126,7 +127,11 @@ function doThisToNeighbors(r, c, thisFunction, mut) {
 
 function infectNeighbor(r, c, i, ii, newgrid) {
     if (grid[r+i][c+ii].getAttribute("state") == "S") {
-        newgrid[r+i][c+ii] = tryInfectNeighbor(r, c);
+        var state = tryInfectNeighbor(r, c)
+        newgrid[r+i][c+ii] = state;
+        if (state == "I") {
+            listOfInfected.push(grid[r+i][c+ii]);
+        }
     }
 }
 
@@ -171,6 +176,10 @@ function tryRecover(r, c){
 
     if (rando() <= chance) {
         return "R";
+        index = listOfInfected.indexOf(getcellAt(r, c));
+        if (index > -1) {
+            array.splice(index, 1);
+        }
     } else {
         return "I";
     }
