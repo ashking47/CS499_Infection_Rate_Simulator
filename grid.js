@@ -95,6 +95,26 @@ function alterCell(cell, state){
     cell.setAttribute("state", state)
 }
 
+function nextStep() {
+    init_grid();
+    var newgrid = getGridCopy();
+    printCells(modifiedCells);
+
+     for (var i = 0; i < listOfInfected.length; i++) {
+            var cell = listOfInfected[i];
+            if ( isInfected(cell) ) {
+                spreadFrom(newgrid, parseInt(cell.getAttribute("row")), parseInt(cell.getAttribute("col")));
+            }
+
+        }
+    for(var i = 0; i < modifiedCells.length; i++){
+        var cell = modifiedCells[i];
+        var r = parseInt(cell.getAttribute("row"));
+        var c = parseInt(cell.getAttribute("col"));
+        cell.setAttribute("state", newgrid[r][c]);
+    }
+}
+
 function spreadFrom(newgrid, r, c){
     
     if( isAlive() ) {
