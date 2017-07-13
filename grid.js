@@ -109,13 +109,12 @@ function nextStep() {
             }
 
         }
-
-    for (var r = 0; r < rows; r++) {
-        for (var c = 0; c < cols; c++) {
-            grid[r][c].setAttribute("state", newgrid[r][c]);
-        }
+    for(var i = 0; i < modifiedCells.length; i++){
+        var cell = modifiedCells[i];
+        var r = parseInt(cell.getAttribute("row"));
+        var c = parseInt(cell.getAttribute("col"));
+        cell.setAttribute("state", newgrid[r][c]);
     }
-    
 }
 
 function spreadFrom(newgrid, r, c){
