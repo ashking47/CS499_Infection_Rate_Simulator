@@ -1,5 +1,5 @@
-var rows = 35; //30
-var cols = 70; //60
+var rows = 40; 
+var cols = 80; 
 var mapOfInfected = new Map();
 var listOfInfected = [];
 var modifiedCells = [];
@@ -11,13 +11,11 @@ var image = clickableGrid(rows,cols,function(cell,row,col,i){
         listOfInfected.push(cell);
         printCells(listOfInfected);
         modifiedCells.push(cell);
-
     }
     else {
         cell.setAttribute("state", "S");
         removeInfected(cell, listOfInfected);
         removeInfected(cell, modifiedCells);
-
     }
 
 });
@@ -97,27 +95,6 @@ function alterCell(cell, state){
     cell.setAttribute("state", state)
 }
 
-function nextStep() {
-    init_grid();
-    var newgrid = getGridCopy();
-    printCells(modifiedCells);
-
-     for (var i = 0; i < listOfInfected.length; i++) {
-            var cell = listOfInfected[i];
-            if ( isInfected(cell) ) {
-                spreadFrom(newgrid, parseInt(cell.getAttribute("row")), parseInt(cell.getAttribute("col")));
-            }
-
-        }
-
-    for (var r = 0; r < rows; r++) {
-        for (var c = 0; c < cols; c++) {
-            grid[r][c].setAttribute("state", newgrid[r][c]);
-        }
-    }
-    
-}
-
 function spreadFrom(newgrid, r, c){
     
     if( isAlive() ) {
@@ -192,7 +169,7 @@ function tryRecover(r, c){
 
     var infectedCount = 0
     doThisToNeighbors(r,c,countInfected,infectedCount);
-    var chance = 0.5 - (0.04 * infectedCount);
+    var chance = 0.5 - (0.04 * infectedCount);            //////////////////////// CHANCE OF RECOVERY / RETRANSMISSION RATE
 
     if (rando() <= chance) {
         index = listOfInfected.indexOf(getCellAt(r, c));
@@ -214,7 +191,7 @@ function countInfected(r, c, i, ii, infectedNeighbors) {
 }
 
 function isAlive(){
-    var chanceOfDeath = 0.04;
+    var chanceOfDeath = 0.04;           ///////////////////////////// CHANCE OF DEATH
     if (rando() <= chanceOfDeath) {
         return false;
     } else {
@@ -222,8 +199,8 @@ function isAlive(){
     }
 }
 
-function tryInfectNeighbor(){
-    if (rando() <= .5) {
+function tryInfectNeighbor(){               //////////////////////// CHANCE TO INFECT NEIGHBOR
+    if (rando() <= .2) {
         return "I";
     } else {
         return "S";
@@ -232,4 +209,26 @@ function tryInfectNeighbor(){
 
 function rando(){
     return Math.random();
+}
+
+function nextStep() {
+    init_grid();
+    var newgrid = getGridCopy();
+    printCells(modifiedCells);
+
+     for (var i = 0; i < listOfInfected.length; i++) {
+            var cell = listOfInfected[i];
+            if ( isInfected(cell) ) {
+                spreadFrom(newgrid, parseInt(cell.getAttribute("row")), parseInt(cell.getAttribute("col")));
+            }
+
+        }
+
+    for ( var j = 0; j < modifiedCells.length; j++ ){
+        var cell = modifiedCells[j];
+        var r = parseInt(cell.getAttribute("row"));
+        var c = parseInt(cell.getAttribute("col"));
+        grid[r][c].setAttribute("state", newgrid[r][c]);
+    }
+    
 }
