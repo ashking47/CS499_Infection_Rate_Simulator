@@ -33,18 +33,3 @@ grid td[state="S"] {
     opacity: .3;
     filter: alpha(opacity=30);
 }
-/*.grid td.S {
-    background-color: #E6E6F4;
-    opacity: .3;
-    filter: alpha(opacity=30);
-}
-.grid td.D {
-    background-color: black;
-    opacity: .3;
-    filter: alpha(opacity=30);
-}
-.grid td.R {
-    background-color: green;
-    opacity: .3;
-    filter: alpha(opacity=30);
-}*/

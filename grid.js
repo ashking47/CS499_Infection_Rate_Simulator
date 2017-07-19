@@ -252,3 +252,9 @@ function nextStep() {
     }
     
 }
+
+function startSim() {
+    for( var days = 0; days < 1; days++) {
+        nextStep();
+    }
+}
