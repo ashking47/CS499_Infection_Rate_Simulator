@@ -4,12 +4,12 @@ var mapOfInfected = new Map();
 var listOfInfected = [];
 var modifiedCells = [];
 
+
 var image = clickableGrid(rows,cols,function(cell,row,col,i){
 
     if (cell.getAttribute("state") !='I') {
         cell.setAttribute("state", "I");
         listOfInfected.push(cell);
-        printCells(listOfInfected);
         modifiedCells.push(cell);
     }
     else {
@@ -20,6 +20,7 @@ var image = clickableGrid(rows,cols,function(cell,row,col,i){
 
 });
 
+//used for testing to make sure cells are actually getting added/removed from arrays in above function.
 function printCells(array){
     for(var i = 0; i < array.length; i++){
         console.log(array[i]);
@@ -95,18 +96,21 @@ function alterCell(cell, state){
     cell.setAttribute("state", state)
 }
 
+
 function nextStep() {
     init_grid();
     var newgrid = getGridCopy();
     printCells(modifiedCells);
 
+//Takes the cells saved in the infected array and uses those to try and infect surrounding cells.
      for (var i = 0; i < listOfInfected.length; i++) {
             var cell = listOfInfected[i];
             if ( isInfected(cell) ) {
                 spreadFrom(newgrid, parseInt(cell.getAttribute("row")), parseInt(cell.getAttribute("col")));
             }
-
         }
+
+//Takes the cells in the modified cell array(cells that are recovered/dead/infected) and pushes them to the new grid.
     for(var i = 0; i < modifiedCells.length; i++){
         var cell = modifiedCells[i];
         var r = parseInt(cell.getAttribute("row"));
@@ -116,7 +120,6 @@ function nextStep() {
 }
 
 function spreadFrom(newgrid, r, c){
-    
     if( isAlive() ) {
         newgrid[r][c] = tryRecover(r, c);
     } else {
@@ -128,7 +131,9 @@ function spreadFrom(newgrid, r, c){
 
 }
 
-function doThisToNeighbors(r, c, thisFunction, mut) {
+//actionFunction is a function that will either infect, recover, or kill cells.
+//doThisToNeighbors is a function that will take the actionFunction and perform that action on the surrounding cells.
+function doThisToNeighbors(r, c, actionFunction, mut) {
     var borders = getBorders(r, c);
     var left = borders.left;
     var right = borders.right;
@@ -136,7 +141,7 @@ function doThisToNeighbors(r, c, thisFunction, mut) {
     var bottom = borders.bottom;
     for(var i = top; i<=bottom; i++){
         for (var ii = left; ii<=right; ii++) {
-            thisFunction(r, c, i, ii, mut);    
+            actionFunction(r, c, i, ii, mut);    
         }
     }
 }
@@ -151,7 +156,7 @@ function infectNeighbor(r, c, i, ii, newgrid) {
         }
     }
 }
-
+//This function retrieves the borders of the grid so that the program will continue even if it reaches one of the edges.
 function getBorders(r, c) {
     var left = -1;
     var right = 1;
@@ -189,9 +194,9 @@ function tryRecover(r, c){
 
     var infectedCount = 0
     doThisToNeighbors(r,c,countInfected,infectedCount);
-    var chance = 0.5 - (0.04 * infectedCount);            //////////////////////// CHANCE OF RECOVERY / RETRANSMISSION RATE
+    var chance = 0.3 - (0.04 * infectedCount);  // var chance = diseaseAttributes[1];
 
-    if (rando() <= chance) {
+    if (randomNumber() <= chance) {
         index = listOfInfected.indexOf(getCellAt(r, c));
         if (index > -1) {
             listOfInfected.splice(index, 1);
@@ -211,8 +216,8 @@ function countInfected(r, c, i, ii, infectedNeighbors) {
 }
 
 function isAlive(){
-    var chanceOfDeath = 0.04;           ///////////////////////////// CHANCE OF DEATH
-    if (rando() <= chanceOfDeath) {
+    var chanceOfDeath = 0.1 ;  // chanceOfDeath = diseaseAttributes[2]
+    if (randomNumber() <= chanceOfDeath) {
         return false;
     } else {
         return true;
@@ -220,37 +225,15 @@ function isAlive(){
 }
 
 function tryInfectNeighbor(){               //////////////////////// CHANCE TO INFECT NEIGHBOR
-    if (rando() <= .2) {
+    if (randomNumber() <= 0.5 ) { // randomNumber() <= diseaseAttributes[0];
         return "I";
     } else {
         return "S";
     }
 }
 
-function rando(){
+function randomNumber(){
     return Math.random();
-}
-
-function nextStep() {
-    init_grid();
-    var newgrid = getGridCopy();
-    printCells(modifiedCells);
-
-     for (var i = 0; i < listOfInfected.length; i++) {
-            var cell = listOfInfected[i];
-            if ( isInfected(cell) ) {
-                spreadFrom(newgrid, parseInt(cell.getAttribute("row")), parseInt(cell.getAttribute("col")));
-            }
-
-        }
-
-    for ( var j = 0; j < modifiedCells.length; j++ ){
-        var cell = modifiedCells[j];
-        var r = parseInt(cell.getAttribute("row"));
-        var c = parseInt(cell.getAttribute("col"));
-        grid[r][c].setAttribute("state", newgrid[r][c]);
-    }
-    
 }
 
 function startSim() {
@@ -258,3 +241,9 @@ function startSim() {
         nextStep();
     }
 }
+
+/*diseaseAttributes should call fetchDisease from DBConnection. fetchDisease creates a connection to the db and returns an array of selected values retrieved from a query.
+The db connects and stores the values in the array but does not transfer over to this class. I cannot figure out why it will not work.
+*/
+var selectedDisease = getDiseaseSelected();
+var diseaseAttributes = fetchDisease(selectedDisease);//List of attributes: infection_rate, recovery_rate, _death,rate

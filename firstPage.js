@@ -1,7 +1,12 @@
 var diseaseSelected;
 
 function diseaseSelection(){
-    diseaseSelected = document.getElementById("diseaseDropdown").nodeValue;
+    diseaseSelected = document.getElementById('diseaseDropdown').value;
+    console.log(diseaseSelected);
+    return diseaseSelected;
+}
+
+function getDiseaseSelected(){
     return diseaseSelected;
 }
 
