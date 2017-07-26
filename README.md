@@ -3,3 +3,9 @@ This is an infection rate simulator. To start this program open the MainPage.htm
 
 //This program does not properly retrieve data from the DBConnection class to grid.js
 The database connection is established and the query and data retrieved are correct it just does not translate over to grid.js
+
+For this project we would still like to achieve the following:
+1. properly connect grid.js to DBConnection.js
+2. Add in long and lad coordinates for different cities into our database
+3. Create a dropdown for these locations in the MainPage.html
+4. Find a new way to redraw the grid that would decrease time complexity
